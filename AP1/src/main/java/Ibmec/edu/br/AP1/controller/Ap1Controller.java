@@ -23,8 +23,7 @@ public class Ap1Controller {
 
     @PostMapping
     public ResponseEntity<Cliente> saveclient(@Valid @RequestBody Cliente ap1) throws Exception {
-        Cliente response = service.createAp1(ap1);
-
+        Cliente response = service.criaUsuario(ap1);
         return new ResponseEntity<>(response, HttpStatus.CREATED);
     }
 }

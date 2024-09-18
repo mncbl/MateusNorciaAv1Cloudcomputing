@@ -31,6 +31,11 @@ public class Cliente {
     @NotNull(message = "Campo data é obrigatório")
     @DateTimeFormat(pattern = "yyyy-MM-dd")
     private LocalDate date;
+
+
+    @Pattern(regexp = "^\\(\\d{2}\\)\\d{9}$", message = "Número de telefone inválido. O formato deve ser (XX)XXXXXXXXX.")
+    private String telefone;
+
 }
 
 
