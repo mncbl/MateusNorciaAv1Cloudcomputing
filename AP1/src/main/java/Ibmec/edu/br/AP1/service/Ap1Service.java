@@ -1,20 +1,21 @@
 package Ibmec.edu.br.AP1.service;
 
 import Ibmec.edu.br.AP1.model.Cliente;
+import Ibmec.edu.br.AP1.model.Endereco;
 import org.springframework.stereotype.Service;
+
 import java.time.LocalDate;
 import java.time.Period;
-import java.time.Year;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
 
 @Service
 public class Ap1Service {
-    private static List<Cliente> Ap1s = new ArrayList<>();
+    private static List<Cliente> Ap1clientes = new ArrayList<>();
+    private static List<Endereco> Ap1enderecos = new ArrayList<>();
 
     public List<Cliente> getallclients(){
-        return Ap1Service.Ap1s;
+        return Ap1Service.Ap1clientes;
     }
     public Cliente getCliente(String cpf) {
         return findCliente(cpf);
@@ -37,7 +38,7 @@ public class Ap1Service {
             throw  new Exception("O cliente tem idade invalida");
         }
 
-        for (Cliente clients : Ap1s){
+        for (Cliente clients : Ap1clientes){
             //Verifica se o email é unico
             if (clients.getEmail().equals(client.getEmail())){
                 throw new Exception ("Email já existe, tente um novo");
@@ -50,7 +51,7 @@ public class Ap1Service {
             }
 
         }
-        Ap1Service.Ap1s.add(client);
+        Ap1Service.Ap1clientes.add(client);
         return client;
     }
 
@@ -63,7 +64,7 @@ public class Ap1Service {
 
 
         //Atualiza o item
-        Ap1s.remove(ClienteSerAtualizado);
+        Ap1clientes.remove(ClienteSerAtualizado);
 
         ClienteSerAtualizado.setName(newCliente.getName());
         ClienteSerAtualizado.setEmail(newCliente.getEmail());
@@ -71,7 +72,7 @@ public class Ap1Service {
         ClienteSerAtualizado.setDate(newCliente.getDate());
         ClienteSerAtualizado.setTelefone(newCliente.getTelefone());
 
-        Ap1s.add(ClienteSerAtualizado);
+        Ap1clientes.add(ClienteSerAtualizado);
 
         return ClienteSerAtualizado;
 
@@ -79,7 +80,7 @@ public class Ap1Service {
     private Cliente findCliente(String cpf) {
         Cliente response = null;
 
-        for (Cliente clients : Ap1s) {
+        for (Cliente clients : Ap1clientes) {
             if (clients.getCpf().equals(cpf)) {
                 response = clients;
                 break;
@@ -87,4 +88,53 @@ public class Ap1Service {
         }
         return response;
     }
+    // ENDEREÇOS
+    public Endereco criaEndereco(Endereco enderec) throws Exception {
+        // lista para verificação do estado
+        List<String> estadosList = new ArrayList<>(){{
+            add("AC"); // Acre
+            add("AL"); // Alagoas
+            add("AP"); // Amapá
+            add("AM"); // Amazonas
+            add("BA"); // Bahia
+            add("CE"); // Ceará
+            add("DF"); // Distrito Federal
+            add("ES"); // Espírito Santo
+            add("GO"); // Goiás
+            add("MA"); // Maranhão
+            add("MT"); // Mato Grosso
+            add("MS"); // Mato Grosso do Sul
+            add("MG"); // Minas Gerais
+            add("PA"); // Pará
+            add("PB"); // Paraíba
+            add("PR"); // Paraná
+            add("PE"); // Pernambuco
+            add("PI"); // Piauí
+            add("RJ"); // Rio de Janeiro
+            add("RN"); // Rio Grande do Norte
+            add("RS"); // Rio Grande do Sul
+            add("RO"); // Rondônia
+            add("RR"); // Roraima
+            add("SC"); // Santa Catarina
+            add("SP"); // São Paulo
+            add("SE"); // Sergipe
+            add("TO"); // Tocantins
+        }};
+
+        if (!estadosList.contains(enderec.getEstado())){
+            throw new Exception("A Sigla do estado Brasileiro esta incorreta, colocar em letras maiusculas");
+
+        }
+        Cliente clienteResponsavel = findCliente(enderec.getCpf_do_responsavel());
+        if (clienteResponsavel == null) {
+            throw new Exception("CPF do responsável não encontrado na base de clientes.");
+        }
+
+
+
+        Ap1Service.Ap1enderecos.add(enderec);
+        return enderec;
+    }
+
+
 }
