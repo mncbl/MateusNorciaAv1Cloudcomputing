@@ -11,7 +11,7 @@ import Ibmec.edu.br.AP1.model.Cliente;
 import java.util.List;
 
 @RestController
-@RequestMapping("/ap1")
+@RequestMapping("/ap1/cliente")
 public class Ap1Controller {
     @Autowired
     private Ap1Service service;
@@ -23,7 +23,21 @@ public class Ap1Controller {
 
     @PostMapping
     public ResponseEntity<Cliente> saveclient(@Valid @RequestBody Cliente ap1) throws Exception {
+
         Cliente response = service.criaUsuario(ap1);
+
         return new ResponseEntity<>(response, HttpStatus.CREATED);
+    }
+    @PutMapping("{cpf}")
+    public ResponseEntity<Cliente> updateCliente(@PathVariable("cpf") String cpf, @Valid @RequestBody Cliente novosDados) {
+
+        Cliente ClienteSerAtualizado = service.getCliente(cpf);
+
+        if (ClienteSerAtualizado == null)
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+
+        Cliente response = service.updateCliente(cpf, novosDados);
+
+        return new ResponseEntity<>(response, HttpStatus.OK);
     }
 }
