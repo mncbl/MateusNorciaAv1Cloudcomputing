@@ -50,4 +50,17 @@ public class Ap1Controller {
 
         return new ResponseEntity<>(response, HttpStatus.CREATED);
     }
+    @PutMapping("/endereco/{id}")
+    public ResponseEntity<Endereco> updateEndereco(@PathVariable("id") int id, @Valid @RequestBody Endereco novosDadosend) {
+
+        Endereco EnderecoSerAtualizado = service.getEndereco(id);
+
+        if (EnderecoSerAtualizado == null)
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+
+        Endereco responsend = service.updateEndereco(id, novosDadosend);
+
+        return new ResponseEntity<>(responsend,HttpStatus.OK);
+    }
+
 }

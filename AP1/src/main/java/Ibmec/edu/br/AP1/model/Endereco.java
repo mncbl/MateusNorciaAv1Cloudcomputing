@@ -43,6 +43,4 @@ public class Endereco {
     @NotBlank(message = "Campo cpf do responsavel é obrigatório")
     @CPF(message = "coloque um cpf valido")
     private String cpf_do_responsavel;
-
-
 }

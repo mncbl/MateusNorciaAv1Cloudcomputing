@@ -13,12 +13,44 @@ import java.util.List;
 public class Ap1Service {
     private static List<Cliente> Ap1clientes = new ArrayList<>();
     private static List<Endereco> Ap1enderecos = new ArrayList<>();
+    List<String> estadosList = new ArrayList<>(){{
+        add("AC"); // Acre
+        add("AL"); // Alagoas
+        add("AP"); // Amapá
+        add("AM"); // Amazonas
+        add("BA"); // Bahia
+        add("CE"); // Ceará
+        add("DF"); // Distrito Federal
+        add("ES"); // Espírito Santo
+        add("GO"); // Goiás
+        add("MA"); // Maranhão
+        add("MT"); // Mato Grosso
+        add("MS"); // Mato Grosso do Sul
+        add("MG"); // Minas Gerais
+        add("PA"); // Pará
+        add("PB"); // Paraíba
+        add("PR"); // Paraná
+        add("PE"); // Pernambuco
+        add("PI"); // Piauí
+        add("RJ"); // Rio de Janeiro
+        add("RN"); // Rio Grande do Norte
+        add("RS"); // Rio Grande do Sul
+        add("RO"); // Rondônia
+        add("RR"); // Roraima
+        add("SC"); // Santa Catarina
+        add("SP"); // São Paulo
+        add("SE"); // Sergipe
+        add("TO"); // Tocantins
+    }};
 
     public List<Cliente> getallclients(){
         return Ap1Service.Ap1clientes;
     }
     public Cliente getCliente(String cpf) {
         return findCliente(cpf);
+    }
+    public Endereco getEndereco(int id){
+        return findEndereco(id);
     }
 
     public Cliente criaUsuario(Cliente client) throws Exception {
@@ -91,35 +123,7 @@ public class Ap1Service {
     // ENDEREÇOS
     public Endereco criaEndereco(Endereco enderec) throws Exception {
         // lista para verificação do estado
-        List<String> estadosList = new ArrayList<>(){{
-            add("AC"); // Acre
-            add("AL"); // Alagoas
-            add("AP"); // Amapá
-            add("AM"); // Amazonas
-            add("BA"); // Bahia
-            add("CE"); // Ceará
-            add("DF"); // Distrito Federal
-            add("ES"); // Espírito Santo
-            add("GO"); // Goiás
-            add("MA"); // Maranhão
-            add("MT"); // Mato Grosso
-            add("MS"); // Mato Grosso do Sul
-            add("MG"); // Minas Gerais
-            add("PA"); // Pará
-            add("PB"); // Paraíba
-            add("PR"); // Paraná
-            add("PE"); // Pernambuco
-            add("PI"); // Piauí
-            add("RJ"); // Rio de Janeiro
-            add("RN"); // Rio Grande do Norte
-            add("RS"); // Rio Grande do Sul
-            add("RO"); // Rondônia
-            add("RR"); // Roraima
-            add("SC"); // Santa Catarina
-            add("SP"); // São Paulo
-            add("SE"); // Sergipe
-            add("TO"); // Tocantins
-        }};
+
 
         if (!estadosList.contains(enderec.getEstado())){
             throw new Exception("A Sigla do estado Brasileiro esta incorreta, colocar em letras maiusculas");
@@ -135,6 +139,40 @@ public class Ap1Service {
         Ap1Service.Ap1enderecos.add(enderec);
         return enderec;
     }
+    public Endereco updateEndereco(int id, Endereco newEndereco) {
+        Endereco EnderecoSerAtualizado = findEndereco(id);
 
+        if (EnderecoSerAtualizado == null)
+            return null;
+
+
+
+        //Atualiza o item
+        Ap1enderecos.remove(EnderecoSerAtualizado);
+
+        EnderecoSerAtualizado.setRua(newEndereco.getRua());
+        EnderecoSerAtualizado.setNumero(newEndereco.getNumero());
+        EnderecoSerAtualizado.setBairro(newEndereco.getBairro());
+        EnderecoSerAtualizado.setCidade(newEndereco.getCidade());
+        EnderecoSerAtualizado.setEstado(newEndereco.getEstado());
+        EnderecoSerAtualizado.setCep(newEndereco.getCep());
+        EnderecoSerAtualizado.setCpf_do_responsavel(newEndereco.getCpf_do_responsavel());
+
+        Ap1enderecos.add(EnderecoSerAtualizado);
+
+        return EnderecoSerAtualizado;
+
+    }
+    private Endereco findEndereco(int id) {
+        Endereco response = null;
+
+        for (Endereco endereco: Ap1enderecos) {
+            if (endereco.getId() == id) {
+                response = endereco;
+                break;
+            }
+        }
+        return response;
+    }
 
 }
