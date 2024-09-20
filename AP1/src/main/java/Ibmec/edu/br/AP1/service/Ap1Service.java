@@ -10,6 +10,7 @@ import java.time.Period;
 import java.util.ArrayList;
 import java.util.List;
 import java.io.*;
+import java.net.*;
 
 @Service
 public class Ap1Service {
@@ -221,14 +222,13 @@ public class Ap1Service {
     }
 
     //Verifica se CEP existe no documento
-    public void verificaCep(String cep)throws Exception{
-        String caminhoCSV = "C:/testes/MateusNorciaAv1Cloudcomputing/AP1/validador_de_df.csv";
+    public void verificaCep(String cep) throws Exception {
+        String urlCsv = "https://raw.githubusercontent.com/mncbl/MateusNorciaAv1Cloudcomputing/refs/heads/main/AP1/validador_de_df.csv";
         boolean cepEncontrado = false;
 
-        try (BufferedReader br = new BufferedReader(new FileReader(caminhoCSV))) {
+        try (BufferedReader br = new BufferedReader(new InputStreamReader(new URL(urlCsv).openStream()))) {
             String linha;
             while ((linha = br.readLine()) != null) {
-
                 String[] colunas = linha.split(",");
 
                 if (colunas[1].trim().equals(cep)) { // Verifica se o CEP existe
@@ -242,7 +242,7 @@ public class Ap1Service {
         }
 
         if (!cepEncontrado) {
-            throw new Exception("CEP invalido");
+            throw new Exception("CEP inválido");
         }
     }
 
