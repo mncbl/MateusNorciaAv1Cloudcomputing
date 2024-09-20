@@ -47,6 +47,8 @@ public class Ap1Controller {
     @PostMapping("/endereco")
     public ResponseEntity<Endereco> saveEndereco(@Valid @RequestBody Endereco ap1enderec) throws Exception {
 
+        service.verificaCep(ap1enderec.getCep());
+
         Endereco response = service.criaEndereco(ap1enderec);
 
         return new ResponseEntity<>(response, HttpStatus.CREATED);
@@ -54,7 +56,7 @@ public class Ap1Controller {
     // Edita endereço
     @PutMapping("/endereco/{id}")
     public ResponseEntity<Endereco> updateEndereco(@PathVariable("id") int id, @Valid @RequestBody Endereco novosDadosend) throws Exception{
-
+        service.verificaCep(novosDadosend.getCep());
         Endereco EnderecoSerAtualizado = service.getEndereco(id);
 
         if (EnderecoSerAtualizado == null)

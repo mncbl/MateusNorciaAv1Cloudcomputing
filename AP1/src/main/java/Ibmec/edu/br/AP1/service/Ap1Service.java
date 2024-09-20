@@ -9,6 +9,7 @@ import java.time.LocalDate;
 import java.time.Period;
 import java.util.ArrayList;
 import java.util.List;
+import java.io.*;
 
 @Service
 public class Ap1Service {
@@ -217,6 +218,32 @@ public class Ap1Service {
         if (EnderecoSerExcluido == null)
             throw new Exception("Endereço não encontrado");
         Ap1enderecos.remove(EnderecoSerExcluido);
+    }
+
+    //Verifica se CEP existe no documento
+    public void verificaCep(String cep)throws Exception{
+        String caminhoCSV = "C:/testes/MateusNorciaAv1Cloudcomputing/AP1/validador_de_df.csv";
+        boolean cepEncontrado = false;
+
+        try (BufferedReader br = new BufferedReader(new FileReader(caminhoCSV))) {
+            String linha;
+            while ((linha = br.readLine()) != null) {
+
+                String[] colunas = linha.split(",");
+
+                if (colunas[1].trim().equals(cep)) { // Verifica se o CEP existe
+                    cepEncontrado = true;
+                    break;
+                }
+            }
+        } catch (IOException e) {
+            // Caso ocorra algum erro na leitura do arquivo
+            throw new Exception("Erro ao ler o arquivo CSV", e);
+        }
+
+        if (!cepEncontrado) {
+            throw new Exception("CEP invalido");
+        }
     }
 
 }
