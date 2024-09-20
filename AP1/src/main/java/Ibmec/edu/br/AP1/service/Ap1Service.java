@@ -2,6 +2,7 @@ package Ibmec.edu.br.AP1.service;
 
 import Ibmec.edu.br.AP1.model.Cliente;
 import Ibmec.edu.br.AP1.model.Endereco;
+import org.apache.logging.log4j.message.Message;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
@@ -13,7 +14,7 @@ import java.util.List;
 public class Ap1Service {
     private static List<Cliente> Ap1clientes = new ArrayList<>();
     private static List<Endereco> Ap1enderecos = new ArrayList<>();
-    List<String> estadosList = new ArrayList<>(){{
+    List<String> estadosList = new ArrayList<>() {{
         add("AC"); // Acre
         add("AL"); // Alagoas
         add("AP"); // Amapá
@@ -43,14 +44,19 @@ public class Ap1Service {
         add("TO"); // Tocantins
     }};
 
-    public List<Cliente> getallclients(){
+    public List<Cliente> getallclients() {
         return Ap1Service.Ap1clientes;
     }
+
     public Cliente getCliente(String cpf) {
         return findCliente(cpf);
     }
-    public Endereco getEndereco(int id){
+
+    public Endereco getEndereco(int id) {
         return findEndereco(id);
+    }
+    public List<Endereco> getEnderecoCPF(String cpf_do_responsavel) {
+        return findEnderecosPorCpf(cpf_do_responsavel);
     }
 
     public Cliente criaUsuario(Cliente client) throws Exception {
@@ -62,22 +68,22 @@ public class Ap1Service {
         //esta fora do loop pois no primeiro POST ela estava sendo ignorada
         //verifica idade > 18
         if (client.getDate().isAfter(idadeLimite)) {
-            throw  new Exception("O cliente deve ter 18 anos");
+            throw new Exception("O cliente deve ter 18 anos");
 
         }
         // verifica se idade do cliente é valida
-        if (client.getDate().isBefore(idadeMaxima)){
-            throw  new Exception("O cliente tem idade invalida");
+        if (client.getDate().isBefore(idadeMaxima)) {
+            throw new Exception("O cliente tem idade invalida");
         }
 
-        for (Cliente clients : Ap1clientes){
+        for (Cliente clients : Ap1clientes) {
             //Verifica se o email é unico
-            if (clients.getEmail().equals(client.getEmail())){
-                throw new Exception ("Email já existe, tente um novo");
+            if (clients.getEmail().equals(client.getEmail())) {
+                throw new Exception("Email já existe, tente um novo");
 
             }
             //Verifica se o CPF é unico
-            if (clients.getCpf().equals(client.getCpf())){
+            if (clients.getCpf().equals(client.getCpf())) {
                 throw new Exception("Cpf já existe, tente um novo");
 
             }
@@ -109,6 +115,7 @@ public class Ap1Service {
         return ClienteSerAtualizado;
 
     }
+
     private Cliente findCliente(String cpf) {
         Cliente response = null;
 
@@ -120,12 +127,13 @@ public class Ap1Service {
         }
         return response;
     }
+
     // ENDEREÇOS
     public Endereco criaEndereco(Endereco enderec) throws Exception {
         // lista para verificação do estado
 
 
-        if (!estadosList.contains(enderec.getEstado())){
+        if (!estadosList.contains(enderec.getEstado())) {
             throw new Exception("A Sigla do estado Brasileiro esta incorreta, colocar em letras maiusculas");
 
         }
@@ -135,20 +143,36 @@ public class Ap1Service {
         }
 
 
-
         Ap1Service.Ap1enderecos.add(enderec);
         return enderec;
     }
-    public Endereco updateEndereco(int id, Endereco newEndereco) {
+
+    public Endereco updateEndereco(int id, Endereco newEndereco) throws Exception {
         Endereco EnderecoSerAtualizado = findEndereco(id);
+        Cliente clienteResponsavel = findCliente(newEndereco.getCpf_do_responsavel());
 
         if (EnderecoSerAtualizado == null)
             return null;
 
 
+        if (!estadosList.contains(newEndereco.getEstado())) {
+
+            throw new Exception("A Sigla do estado Brasileiro está incorreta. Coloque em letras maiúsculas.");
+
+        }
+
+        // Verifica se o CPF do responsável é válido
+
+        if (clienteResponsavel == null) {
+
+            throw  new Exception("CPF do responsável não encontrado na base de clientes.");
+
+        }
+
 
         //Atualiza o item
         Ap1enderecos.remove(EnderecoSerAtualizado);
+
 
         EnderecoSerAtualizado.setRua(newEndereco.getRua());
         EnderecoSerAtualizado.setNumero(newEndereco.getNumero());
@@ -163,16 +187,36 @@ public class Ap1Service {
         return EnderecoSerAtualizado;
 
     }
+    private List<Endereco> findEnderecosPorCpf(String cpf_do_responsavel) {
+        List<Endereco> enderecosFiltrados = new ArrayList<>();
+
+        for (Endereco endereco : Ap1enderecos) {
+            if (endereco.getCpf_do_responsavel().equals(cpf_do_responsavel)) {
+                enderecosFiltrados.add(endereco);
+            }
+        }
+
+        return enderecosFiltrados;
+    }
+
     private Endereco findEndereco(int id) {
         Endereco response = null;
 
-        for (Endereco endereco: Ap1enderecos) {
+        for (Endereco endereco : Ap1enderecos) {
             if (endereco.getId() == id) {
                 response = endereco;
                 break;
             }
         }
         return response;
+    }
+    //Deleta Endereco
+    public void deleteEndereco(int id) throws Exception{
+        Endereco  EnderecoSerExcluido = findEndereco(id);
+
+        if (EnderecoSerExcluido == null)
+            throw new Exception("Endereço não encontrado");
+        Ap1enderecos.remove(EnderecoSerExcluido);
     }
 
 }
