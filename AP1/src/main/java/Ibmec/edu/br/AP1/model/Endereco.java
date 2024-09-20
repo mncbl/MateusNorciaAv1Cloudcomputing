@@ -26,7 +26,7 @@ public class Endereco {
     private String numero;
 
     @NotBlank(message = "Campo bairro é obrigatório ")
-    @Size(min = 3, max = 100, message = "Campo rua deve ter no minimo 3 caracteres e no maximo 100")
+    @Size(min = 3, max = 100, message = "Campo bairro deve ter no minimo 3 caracteres e no maximo 100")
     private String bairro;
 
     @NotBlank(message = "Campo cidade é obrigatório ")
