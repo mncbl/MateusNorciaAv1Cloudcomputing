@@ -3,6 +3,7 @@ package Ibmec.edu.br.AP1.model;
 import jakarta.validation.constraints.*;
 
 
+import lombok.AllArgsConstructor;
 import lombok.Data;
 import org.hibernate.validator.constraints.br.CPF;
 import org.springframework.format.annotation.DateTimeFormat;
@@ -11,7 +12,8 @@ import org.springframework.validation.annotation.Validated;
 import java.time.LocalDate;
 import java.util.Date;
 
-@Data
+@Data //Gerou apenas get e set
+@AllArgsConstructor // vai gerar os contrutores
 public class Cliente {
 
     @NotBlank(message = "Campo nome é obrigatório")
