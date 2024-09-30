@@ -1,5 +1,6 @@
 package Ibmec.edu.br.AP1.model;
 
+import jakarta.persistence.*;
 import jakarta.validation.constraints.*;
 
 
@@ -14,28 +15,38 @@ import java.util.Date;
 
 @Data //Gerou apenas get e set
 @AllArgsConstructor // vai gerar os contrutores
+@Entity
 public class Cliente {
+    @Id
+    @GeneratedValue(strategy= GenerationType.IDENTITY)
+    private int id;
 
     @NotBlank(message = "Campo nome é obrigatório")
     @Size(min = 3, max = 100, message = "O nome deve ter no minimo 3 caracteres e no maximo 100")
+    @Column
     private String name;
 
-
+    @Column
     @NotBlank(message = "Campo email é obrigatório")
     @Email(message = "Campo email não esta no formato correto")
+
     private String email;
 
+    @Column
     @NotBlank(message = "Campo cpf é obrigatório")
 //    @Size(min = 11, max = 11, message = "O cpf deve ter 11 digitos")
     @CPF(message = "coloque um cpf valido")
-    private String cpf;
 
+    private String cpf;
+    @Column
     @NotNull(message = "Campo data é obrigatório")
     @DateTimeFormat(pattern = "yyyy-MM-dd")
+
     private LocalDate date;
 
-
+    @Column
     @Pattern(regexp = "^\\(\\d{2}\\)\\d{9}$", message = "Número de telefone inválido. O formato deve ser (XX)XXXXXXXXX.")
+
     private String telefone;
 
 }

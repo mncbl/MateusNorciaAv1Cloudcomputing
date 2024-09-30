@@ -16,6 +16,7 @@ import java.net.*;
 public class Ap1Service {
     private static List<Cliente> Ap1clientes = new ArrayList<>();
     private static List<Endereco> Ap1enderecos = new ArrayList<>();
+
     List<String> estadosList = new ArrayList<>() {{
         add("AC"); // Acre
         add("AL"); // Alagoas
@@ -92,6 +93,7 @@ public class Ap1Service {
 
         }
         Ap1Service.Ap1clientes.add(client);
+
         return client;
     }
 

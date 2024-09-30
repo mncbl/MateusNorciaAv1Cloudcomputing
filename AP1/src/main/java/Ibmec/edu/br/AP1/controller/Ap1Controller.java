@@ -1,6 +1,8 @@
 package Ibmec.edu.br.AP1.controller;
 
 import Ibmec.edu.br.AP1.model.Endereco;
+import Ibmec.edu.br.AP1.repository.ClienteRepository;
+import Ibmec.edu.br.AP1.repository.EnderecoRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import Ibmec.edu.br.AP1.service.Ap1Service;
 import org.springframework.http.HttpStatus;
@@ -15,6 +17,10 @@ import java.util.List;
 @RequestMapping("/ap1")
 public class Ap1Controller {
     @Autowired
+    private ClienteRepository clienteRepository;
+    @Autowired
+    private EnderecoRepository enderecoRository;
+    @Autowired
     private Ap1Service service;
     //ve todos os clientes
     @GetMapping("/clientes")
@@ -25,9 +31,9 @@ public class Ap1Controller {
     @PostMapping("/clientes")
     public ResponseEntity<Cliente> saveclient(@Valid @RequestBody Cliente ap1) throws Exception {
 
-        Cliente response = service.criaUsuario(ap1);
+        this.clienteRepository.save(ap1);
 
-        return new ResponseEntity<>(response, HttpStatus.CREATED);
+        return new ResponseEntity<>(ap1, HttpStatus.CREATED);
     }
     //editacliente
     @PutMapping("/clientes/{cpf}")
@@ -89,6 +95,9 @@ public class Ap1Controller {
 
         return new ResponseEntity<>(response, HttpStatus.OK);
     }
+
+
+
 
 
 }

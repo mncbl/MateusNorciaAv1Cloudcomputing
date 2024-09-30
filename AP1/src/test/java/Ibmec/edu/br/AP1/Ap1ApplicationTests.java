@@ -8,6 +8,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 
 import java.time.LocalDate;
 
+
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
@@ -22,14 +23,14 @@ class Ap1ApplicationTests {
 
 	@Test
 	public void testClienteMenorDe18() {
-		Cliente cliente = new Cliente("Teste", "teste@gmail.com", "12345678901", LocalDate.parse("2005-12-12"), "12345678901");
+		Cliente cliente = new Cliente(1,"Teste", "teste@gmail.com", "12345678901", LocalDate.parse("2005-12-12"), "12345678901");
 		Exception exception = assertThrows(Exception.class, () -> ap1Service.criaUsuario(cliente));
 		assertEquals("O cliente deve ter 18 anos ou mais", exception.getMessage());
 	}
 
 	@Test
 	public void testClienteAcimaDe100() {
-		Cliente cliente = new Cliente("Teste", "teste@gmail.com", "12345678901", LocalDate.parse("1920-12-12"), "12345678901");
+		Cliente cliente = new Cliente(1,"Teste", "teste@gmail.com", "12345678901", LocalDate.parse("1920-12-12"), "12345678901");
 		Exception exception = assertThrows(Exception.class, () -> ap1Service.criaUsuario(cliente));
 		assertEquals("O cliente tem idade inválida", exception.getMessage());
 	}
@@ -39,7 +40,7 @@ class Ap1ApplicationTests {
 		Cliente cliente1 = new Cliente("Teste1", "teste@gmail.com", "12345678901", LocalDate.parse("2000-12-12"), "12345678901");
 		ap1Service.criaUsuario(cliente1);
 
-		Cliente cliente2 = new Cliente("Teste2", "teste@gmail.com", "98765432101", LocalDate.parse("1990-12-12"), "98765432101");
+		Cliente cliente2 = new Cliente("", "teste@gmail.com", "98765432101", LocalDate.parse("1990-12-12"), "98765432101");
 		Exception exception = assertThrows(Exception.class, () -> ap1Service.criaUsuario(cliente2));
 		assertEquals("Email já existe, tente um novo", exception.getMessage());
 	}
@@ -79,7 +80,7 @@ class Ap1ApplicationTests {
 		Cliente cliente = new Cliente("No", "mateasdassadasdasdadadase@gmail.com", "12345678902", LocalDate.parse("2000-12-12"), "12345678902");
 		Cliente resultado = ap1Service.criaUsuario(cliente);
 		Exception exception = assertThrows(Exception.class, () -> ap1Service.criaUsuario(cliente));
-		assertEquals("nome menor que 3 caracteres", exception.getMessage());
+		assertExceptions("nome menor que 3 caracteres");
 
 
 	}
