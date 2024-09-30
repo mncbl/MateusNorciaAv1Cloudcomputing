@@ -12,9 +12,9 @@ import org.springframework.validation.annotation.Validated;
 
 import java.time.LocalDate;
 import java.util.Date;
+import java.util.List;
 
 @Data //Gerou apenas get e set
-@AllArgsConstructor // vai gerar os contrutores
 @Entity
 public class Cliente {
     @Id
@@ -29,25 +29,26 @@ public class Cliente {
     @Column
     @NotBlank(message = "Campo email é obrigatório")
     @Email(message = "Campo email não esta no formato correto")
-
     private String email;
 
     @Column
     @NotBlank(message = "Campo cpf é obrigatório")
 //    @Size(min = 11, max = 11, message = "O cpf deve ter 11 digitos")
     @CPF(message = "coloque um cpf valido")
-
     private String cpf;
+
     @Column
     @NotNull(message = "Campo data é obrigatório")
     @DateTimeFormat(pattern = "yyyy-MM-dd")
-
     private LocalDate date;
 
     @Column
     @Pattern(regexp = "^\\(\\d{2}\\)\\d{9}$", message = "Número de telefone inválido. O formato deve ser (XX)XXXXXXXXX.")
-
     private String telefone;
+
+    @OneToMany
+    @JoinColumn(referencedColumnName = "id", name = "endereco_id")
+    private List<Endereco> comments;
 
 }
 

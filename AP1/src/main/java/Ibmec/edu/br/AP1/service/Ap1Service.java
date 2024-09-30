@@ -2,7 +2,13 @@ package Ibmec.edu.br.AP1.service;
 
 import Ibmec.edu.br.AP1.model.Cliente;
 import Ibmec.edu.br.AP1.model.Endereco;
+import Ibmec.edu.br.AP1.repository.ClienteRepository;
+import Ibmec.edu.br.AP1.repository.EnderecoRepository;
+import jakarta.xml.ws.Response;
 import org.apache.logging.log4j.message.Message;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
@@ -14,6 +20,11 @@ import java.net.*;
 
 @Service
 public class Ap1Service {
+    @Autowired
+    private ClienteRepository clienteRepository;
+    @Autowired
+    private EnderecoRepository enderecoRository;
+
     private static List<Cliente> Ap1clientes = new ArrayList<>();
     private static List<Endereco> Ap1enderecos = new ArrayList<>();
 
@@ -48,11 +59,13 @@ public class Ap1Service {
     }};
 
     public List<Cliente> getallclients() {
-        return Ap1Service.Ap1clientes;
+        return clienteRepository.findAll();
     }
 
-    public Cliente getCliente(String cpf) {
-        return findCliente(cpf);
+    public ResponseEntity<Cliente> getCliente(Integer id) {
+        return clienteRepository.findById(id)
+                .map(cliente -> new ResponseEntity<>(cliente, HttpStatus.OK))
+                .orElse(new ResponseEntity<>(HttpStatus.NOT_FOUND));
     }
 
     public Endereco getEndereco(int id) {
@@ -98,40 +111,32 @@ public class Ap1Service {
     }
 
 
-    public Cliente updateCliente(String cpf, Cliente newCliente) {
-        Cliente ClienteSerAtualizado = findCliente(cpf);
+    public Cliente updateCliente(int id, Cliente newCliente) {
+        // Busca o cliente existente pelo ID
+        Cliente clienteExistente = findCliente(id);
 
-        if (ClienteSerAtualizado == null)
+        // Se o cliente não for encontrado, retorna null
+        if (clienteExistente == null) {
             return null;
-
-
-        //Atualiza o item
-        Ap1clientes.remove(ClienteSerAtualizado);
-
-        ClienteSerAtualizado.setName(newCliente.getName());
-        ClienteSerAtualizado.setEmail(newCliente.getEmail());
-        ClienteSerAtualizado.setCpf(newCliente.getCpf());
-        ClienteSerAtualizado.setDate(newCliente.getDate());
-        ClienteSerAtualizado.setTelefone(newCliente.getTelefone());
-
-        Ap1clientes.add(ClienteSerAtualizado);
-
-        return ClienteSerAtualizado;
-
-    }
-
-    private Cliente findCliente(String cpf) {
-        Cliente response = null;
-
-        for (Cliente clients : Ap1clientes) {
-            if (clients.getCpf().equals(cpf)) {
-                response = clients;
-                break;
-            }
         }
-        return response;
+
+        // Atualiza os dados do cliente existente com os novos dados
+        clienteExistente.setName(newCliente.getName());
+        clienteExistente.setEmail(newCliente.getEmail());
+        clienteExistente.setCpf(newCliente.getCpf());
+        clienteExistente.setDate(newCliente.getDate());
+        clienteExistente.setTelefone(newCliente.getTelefone());
+
+        // Salva as alterações no repositório
+        clienteRepository.save(clienteExistente);
+
+        return clienteExistente;
     }
 
+    private Cliente findCliente(int id) {
+
+        return clienteRepository.findById(id).orElse(null);
+    }
     // ENDEREÇOS
     public Endereco criaEndereco(Endereco enderec) throws Exception {
         // lista para verificação do estado

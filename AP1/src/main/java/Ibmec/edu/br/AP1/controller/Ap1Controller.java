@@ -12,6 +12,7 @@ import jakarta.validation.Valid;
 import Ibmec.edu.br.AP1.model.Cliente;
 
 import java.util.List;
+import java.util.Optional;
 
 @RestController
 @RequestMapping("/ap1")
@@ -25,7 +26,8 @@ public class Ap1Controller {
     //ve todos os clientes
     @GetMapping("/clientes")
     public ResponseEntity<List<Cliente>> getAp1(){
-        return new ResponseEntity(service.getallclients(), HttpStatus.OK);
+
+        return new ResponseEntity<>(service.getallclients(), HttpStatus.OK);
     }
     //publica cliente
     @PostMapping("/clientes")
@@ -36,19 +38,26 @@ public class Ap1Controller {
         return new ResponseEntity<>(ap1, HttpStatus.CREATED);
     }
     //editacliente
-    @PutMapping("/clientes/{cpf}")
-    public ResponseEntity<Cliente> updateCliente(@PathVariable("cpf") String cpf, @Valid @RequestBody Cliente novosDados) {
+    @PutMapping("/clientes/{id}")
+    public ResponseEntity<Cliente> updateCliente(@PathVariable("id") Integer id, @Valid @RequestBody Cliente novosDados) {
 
-        Cliente ClienteSerAtualizado = service.getCliente(cpf);
+        ResponseEntity<Cliente> clienteExistente = service.getCliente(id);
 
-        if (ClienteSerAtualizado == null)
+        if (clienteExistente.getStatusCode() == HttpStatus.NOT_FOUND) {
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        }
 
-        Cliente response = service.updateCliente(cpf, novosDados);
+        // Atualiza o cliente com os novos dados
+        Cliente clienteAtualizado = service.updateCliente(id, novosDados);
 
-        return new ResponseEntity<>(response, HttpStatus.OK);
+        return new ResponseEntity<>(clienteAtualizado, HttpStatus.OK);
     }
-
+//    @DeleteMapping("{id}")
+//    public ResponseEntity deleteCliente(@PathVariable("id")int id){
+//        Optional<Cliente> optCliente = this.clienteRepository.findById(id);
+//        if(optCliente.isPresent()==false)
+//            return new
+//    }
     // Cria endereço
     @PostMapping("/endereco")
     public ResponseEntity<Endereco> saveEndereco(@Valid @RequestBody Endereco ap1enderec) throws Exception {
