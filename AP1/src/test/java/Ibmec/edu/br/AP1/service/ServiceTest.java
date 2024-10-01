@@ -70,14 +70,19 @@ public class ServiceTest {
         // Simula o comportamento do repositório para retornar um cliente com o mesmo e-mail
         when(clienteRepository.findAll()).thenReturn(Arrays.asList(cliente));
 
+        // Configura um novo cliente com o mesmo email do cliente existente
         Cliente clienteNovo = new Cliente();
+        clienteNovo.setName("Cliente Novo");
         clienteNovo.setEmail("teste@teste.com");
+        clienteNovo.setCpf("321.654.987-00"); // Adicione outros campos obrigatórios se necessário
+        clienteNovo.setDate(LocalDate.of(1995, 5, 20)); // Adicione a data
 
+        // Verifica se a exceção é lançada
         Exception exception = assertThrows(Exception.class, () -> {
             ap1Service.criaUsuario(clienteNovo);
         });
 
-        // Verifica se a exceção lançada é a correta
+        // Verifica se a mensagem de erro é a esperada
         assertEquals("E-mail já existe, tente um novo.", exception.getMessage());
     }
 
