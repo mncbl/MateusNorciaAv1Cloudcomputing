@@ -1,5 +1,6 @@
 package Ibmec.edu.br.AP1.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.*;
 
@@ -11,14 +12,16 @@ import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.validation.annotation.Validated;
 
 import java.time.LocalDate;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
-@Data //Gerou apenas get e set
+
+@Data // Gera os getters, setters, toString, equals e hashCode
 @Entity
 public class Cliente {
     @Id
-    @GeneratedValue(strategy= GenerationType.IDENTITY)
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int id;
 
     @NotBlank(message = "Campo nome é obrigatório")
@@ -28,13 +31,12 @@ public class Cliente {
 
     @Column
     @NotBlank(message = "Campo email é obrigatório")
-    @Email(message = "Campo email não esta no formato correto")
+    @Email(message = "Campo email não está no formato correto")
     private String email;
 
     @Column
-    @NotBlank(message = "Campo cpf é obrigatório")
-//    @Size(min = 11, max = 11, message = "O cpf deve ter 11 digitos")
-    @CPF(message = "coloque um cpf valido")
+    @NotBlank(message = "Campo CPF é obrigatório")
+    @CPF(message = "Coloque um CPF válido")
     private String cpf;
 
     @Column
@@ -46,10 +48,7 @@ public class Cliente {
     @Pattern(regexp = "^\\(\\d{2}\\)\\d{9}$", message = "Número de telefone inválido. O formato deve ser (XX)XXXXXXXXX.")
     private String telefone;
 
-    @OneToMany
-    @JoinColumn(referencedColumnName = "id", name = "endereco_id")
-    private List<Endereco> comments;
-
+    @OneToMany(mappedBy = "cliente")
+    @JsonIgnoreProperties("cliente") // Ignora o cliente no lado Endereco
+    private List<Endereco> enderecos = new ArrayList<>();
 }
-
-

@@ -32,14 +32,25 @@ public class Ap1Controller {
     //publica cliente
     @PostMapping("/clientes")
     public ResponseEntity<Cliente> saveclient(@Valid @RequestBody Cliente ap1) throws Exception {
+        try {
+            // Chama a função que faz as verificações
+            Cliente clienteValidado = service.criaUsuario(ap1);
 
-        this.clienteRepository.save(ap1);
+            // Salva o cliente no banco de dados
+            this.clienteRepository.save(clienteValidado);
 
-        return new ResponseEntity<>(ap1, HttpStatus.CREATED);
+            // Retorna o cliente salvo e o status CREATED
+            return new ResponseEntity<>(clienteValidado, HttpStatus.CREATED);
+
+        } catch (Exception e) {
+            // Retorna um erro com a mensagem de exceção e status BAD_REQUEST
+            return new ResponseEntity<>(null, HttpStatus.BAD_REQUEST);
+        }
     }
+
     //editacliente
     @PutMapping("/clientes/{id}")
-    public ResponseEntity<Cliente> updateCliente(@PathVariable("id") Integer id, @Valid @RequestBody Cliente novosDados) {
+    public ResponseEntity<Cliente> updateCliente(@PathVariable("id") Integer id, @Valid @RequestBody Cliente novosDados) throws Exception {
 
         ResponseEntity<Cliente> clienteExistente = service.getCliente(id);
 
@@ -52,57 +63,97 @@ public class Ap1Controller {
 
         return new ResponseEntity<>(clienteAtualizado, HttpStatus.OK);
     }
-//    @DeleteMapping("{id}")
-//    public ResponseEntity deleteCliente(@PathVariable("id")int id){
-//        Optional<Cliente> optCliente = this.clienteRepository.findById(id);
-//        if(optCliente.isPresent()==false)
-//            return new
-//    }
-    // Cria endereço
-    @PostMapping("/endereco")
-    public ResponseEntity<Endereco> saveEndereco(@Valid @RequestBody Endereco ap1enderec) throws Exception {
-
-        service.verificaCep(ap1enderec.getCep());
-
-        Endereco response = service.criaEndereco(ap1enderec);
-
-        return new ResponseEntity<>(response, HttpStatus.CREATED);
-    }
-    // Edita endereço
-    @PutMapping("/endereco/{id}")
-    public ResponseEntity<Endereco> updateEndereco(@PathVariable("id") int id, @Valid @RequestBody Endereco novosDadosend) throws Exception{
-        service.verificaCep(novosDadosend.getCep());
-        Endereco EnderecoSerAtualizado = service.getEndereco(id);
-
-        if (EnderecoSerAtualizado == null)
+    @DeleteMapping("/clientes/{id}")
+    public ResponseEntity deleteCliente(@PathVariable("id")int id){
+        Optional<Cliente> optCliente = this.clienteRepository.findById(id);
+        if(optCliente.isPresent()==false)
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
-
-        Endereco responsend = service.updateEndereco(id, novosDadosend);
-
-        return new ResponseEntity<>(responsend,HttpStatus.OK);
-    }
-    //Delete Todos os clientes
-    @DeleteMapping("/endereco/{cpf_do_responsavel}/{id}")
-    public  ResponseEntity<Endereco> removeEndereco(@PathVariable("cpf_do_responsavel") String cpf_do_responsavel,@PathVariable("id") int id) throws Exception  {
-
-
-        if (service.getEndereco(id)==null|| !service.getEndereco(id).getCpf_do_responsavel().equals(cpf_do_responsavel))
-            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
-
-        service.deleteEndereco(id);
+        this.clienteRepository.delete(optCliente.get());
         return new ResponseEntity<>(HttpStatus.NO_CONTENT);
-
     }
-    //Busca e Mostra Infomação dos clientes e seus respectivos enderecos
-    @GetMapping("/info/{cpf_do_responsavel}")
-    public ResponseEntity<List<Endereco>> imoveisPorCPF(@PathVariable("cpf_do_responsavel") String cpf_do_responsavel) {
-        List<Endereco> response = service.getEnderecoCPF(cpf_do_responsavel);
+    // Cria endereço
 
-        if (response.isEmpty()) {
+    @PostMapping("/endereco/{id}")
+    public ResponseEntity<Endereco> saveEndereco(@PathVariable("id") int idEnd, @Valid @RequestBody Endereco ap1enderec) throws Exception {
+        // Verifica se o cliente existe
+        Optional<Cliente> optCliente = this.clienteRepository.findById(idEnd);
+
+        if (!optCliente.isPresent()) {
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         }
 
-        return new ResponseEntity<>(response, HttpStatus.OK);
+        Cliente cliente = optCliente.get();
+
+        // Associar o endereço ao cliente
+        ap1enderec.setCliente(cliente);
+
+        // Adicionar o endereço à lista de endereços do cliente
+        cliente.getEnderecos().add(ap1enderec);
+
+        // Salva o cliente com o novo endereço (antes do endereço para evitar inconsistencia)
+        this.clienteRepository.save(cliente);
+
+        // Tenta criar o endereço utilizando a função que valida e salva
+        try {
+            Endereco enderecoSalvo = service.criaEndereco(ap1enderec);
+            return new ResponseEntity<>(enderecoSalvo, HttpStatus.CREATED);
+        } catch (Exception e) {
+            return new ResponseEntity<>(HttpStatus.BAD_REQUEST); // Tratar erro caso o estado ou CEP sejam inválidos
+        }
+    }
+    // Edita endereço
+    @PutMapping("/clientes/{clienteId}/enderecos/{enderecoId}")
+    public ResponseEntity<Endereco> updateEndereco(
+            @PathVariable("clienteId") int clienteId,
+            @PathVariable("enderecoId") int enderecoId,
+            @Valid @RequestBody Endereco novosDadosEndereco) {
+
+        // Verifica se o cliente existe
+        Optional<Cliente> clienteOpt = clienteRepository.findById(clienteId);
+        if (!clienteOpt.isPresent()) {
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND); // Cliente não encontrado
+        }
+
+        // Verifica se o endereço existe
+        Optional<Endereco> enderecoOpt = enderecoRository.findById(enderecoId);
+        if (!enderecoOpt.isPresent()) {
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND); // Endereço não encontrado
+        }
+
+        // Acessa o endereço existente
+        Endereco enderecoExistente = enderecoOpt.get();
+
+        // Atualiza as informações do endereço
+        enderecoExistente.setRua(novosDadosEndereco.getRua());
+        enderecoExistente.setNumero(novosDadosEndereco.getNumero());
+        enderecoExistente.setBairro(novosDadosEndereco.getBairro());
+        enderecoExistente.setCidade(novosDadosEndereco.getCidade());
+        enderecoExistente.setEstado(novosDadosEndereco.getEstado());
+        enderecoExistente.setCep(novosDadosEndereco.getCep());
+
+        // Atualiza o cliente associado
+        enderecoExistente.setCliente(clienteOpt.get());
+
+        // Salva as alterações no repositório
+        enderecoRository.save(enderecoExistente);
+
+        return new ResponseEntity<>(enderecoExistente, HttpStatus.OK); // Retorna o endereço atualizado
+    }
+
+
+    @DeleteMapping("/endereco/{id}")
+    public ResponseEntity<Void> removeEndereco(@PathVariable("id") int id) throws Exception {
+        // Busca o endereço a ser removido
+        Optional<Endereco> enderecoOptional = enderecoRository.findById(id); // Usando findById do repositório
+
+        // Verifica se o endereço existe
+        if (!enderecoOptional.isPresent()) {
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        }
+
+        // Deleta o endereço
+        enderecoRository.delete(enderecoOptional.get()); // Deleta o endereço encontrado
+        return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }
 
 
